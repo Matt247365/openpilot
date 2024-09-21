@@ -73,12 +73,10 @@ class CarState(CarStateBase):
     self.zss_compute = False
     self.zss_cruise_active_last = False
 
-    self.pcm_accel_net = 0
-    self.pcm_neutral_force = 0
     self.zss_angle_offset = 0
     self.zss_threshold_count = 0
 
-  def update(self, cp, cp_cam, frogpilot_toggles):
+  def update(self, cp, cp_cam, CC, frogpilot_toggles):
     ret = car.CarState.new_message()
     fp_ret = custom.FrogPilotCarState.new_message()
 
@@ -158,10 +156,6 @@ class CarState(CarStateBase):
     if self.CP.steerControlType == SteerControlType.angle:
       ret.steerFaultTemporary = ret.steerFaultTemporary or cp.vl["EPS_STATUS"]["LTA_STATE"] in TEMP_STEER_FAULTS
       ret.steerFaultPermanent = ret.steerFaultPermanent or cp.vl["EPS_STATUS"]["LTA_STATE"] in PERM_STEER_FAULTS
-
-      # Lane Tracing Assist control is unavailable (EPS_STATUS->LTA_STATE=0) until
-      # the more accurate angle sensor signal is initialized
-      ret.vehicleSensorsInvalid = not self.accurate_steer_angle_seen
 
     if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
       # TODO: find the bit likely in DSU_CRUISE that describes an ACC fault. one may also exist in CLUTCH
@@ -243,19 +237,15 @@ class CarState(CarStateBase):
       self.lkas_previously_enabled = self.lkas_enabled
       self.lkas_enabled = self.lkas_hud.get("LDA_ON_MESSAGE") == 1
 
-    self.pcm_accel_net = cp.vl["PCM_CRUISE"]["ACCEL_NET"]
-    self.pcm_neutral_force = cp.vl["PCM_CRUISE"]["NEUTRAL_FORCE"]
-
     # ZSS Support - Credit goes to the DragonPilot team!
-    if self.CP.flags & ToyotaFlags.ZSS and self.zss_threshold_count < ZSS_THRESHOLD_COUNT:
+    if self.CP.flags & ToyotaFlags.ZSS and self.zss_threshold_count <= ZSS_THRESHOLD_COUNT:
       zorro_steer = cp.vl["SECONDARY_STEER_ANGLE"]["ZORRO_STEER"]
 
-      # Only compute ZSS offset when cruise is active
-      cruise_active = ret.cruiseState.available
-      if cruise_active and not self.zss_cruise_active_last:
-        self.zss_compute = True  # Cruise was just activated, so allow offset to be recomputed
+      # Only compute ZSS offset when control is active
+      if CC.latActive and not self.zss_cruise_active_last:
         self.zss_threshold_count = 0
-      self.zss_cruise_active_last = cruise_active
+        self.zss_compute = True  # Control was just activated, so allow offset to be recomputed
+      self.zss_cruise_active_last = CC.latActive
 
       # Compute ZSS offset
       if self.zss_compute:

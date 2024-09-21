@@ -41,12 +41,9 @@ CustomSignals: 0
 CustomSounds: 0
 CustomTheme: 1
 CustomUI: 1
-CydiaTune: 1
 DeviceShutdown: 2
-DisableMTSCSmoothing: 0
 DisableOnroadUploads: 1
 DisableUpdates: 1
-DisableVTSCSmoothing: 0
 DisengageOnAccelerator: 0
 DisengageVolume: 0.000000
 DongleId: a0234ef2807d2dc8
@@ -66,7 +63,6 @@ FireTheBabysitter: 1
 ForceAutoTune: 0
 ForceFingerprint: 1
 FPSCounter: 0
-FrogsGoMooTune: 0
 FullMap: 0
 GasRegenCmd: 0
 GitBranch: FrogPilot
@@ -115,7 +111,6 @@ MapboxPublicKey: pk.key
 MapboxSecretKey: foobar
 Model: los-angeles
 ModelUI: 1
-MTSCAggressiveness: 100
 MTSCCurvatureCheck: 0
 MTSCEnabled: 1
 MTSCLimit: 159
@@ -154,7 +149,6 @@ RefuseVolume: 100
 RelaxedFollow: 1.75
 RelaxedJerk: 1.0
 ReverseCruise: 0
-ReverseCruiseUI: 0
 RoadEdgesWidth: 5
 RoadNameUI: 1
 RotatingWheel: 1
