@@ -305,6 +305,8 @@ struct CarState {
     }
   }
 
+  zssSteer @51 :Float32;
+
   # deprecated
   errorsDEPRECATED @0 :List(CarEvent.EventName);
   brakeLightsDEPRECATED @19 :Bool;

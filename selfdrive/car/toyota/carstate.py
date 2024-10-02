@@ -246,6 +246,7 @@ class CarState(CarStateBase):
     # ZSS Support - Credit goes to the DragonPilot team!
     if self.CP.flags & ToyotaFlags.ZSS and self.zss_threshold_count <= ZSS_THRESHOLD_COUNT:
       zorro_steer = cp.vl["SECONDARY_STEER_ANGLE"]["ZORRO_STEER"]
+      ret.zssSteer = zorro_steer
 
       # Only compute ZSS offset when control is active
       if CC.latActive and not self.zss_cruise_active_last:
@@ -265,6 +266,8 @@ class CarState(CarStateBase):
         self.zss_threshold_count += 1
       else:
         ret.steeringAngleDeg = steering_angle_deg
+    else:
+      ret.zssSteer = 0
 
     return ret, fp_ret
 
