@@ -131,14 +131,13 @@ class ThemeManager:
     return november_first + datetime.timedelta(days=(3 - day_of_week + 21) % 7 + 21)
 
   @staticmethod
-  def is_within_week_of(target_date, current_date):
+  def is_within_week_of(target_date, now):
     start_of_week = target_date - datetime.timedelta(days=target_date.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
-    return start_of_week <= current_date <= end_of_week
+    return start_of_week <= now <= end_of_week
 
-  def update_holiday(self):
-    current_date = datetime.datetime.now()
-    year = current_date.year
+  def update_holiday(self, now):
+    year = now.year
 
     holidays = {
       "new_years": datetime.datetime(year, 1, 1),
@@ -147,6 +146,7 @@ class ThemeManager:
       "world_frog_day": datetime.datetime(year, 3, 20),
       "april_fools": datetime.datetime(year, 4, 1),
       "easter_week": self.calculate_easter(year),
+      "may_the_fourth": datetime.datetime(year, 5, 4),
       "cinco_de_mayo": datetime.datetime(year, 5, 5),
       "fourth_of_july": datetime.datetime(year, 7, 4),
       "halloween_week": datetime.datetime(year, 10, 31),
@@ -155,11 +155,10 @@ class ThemeManager:
     }
 
     for holiday, date in holidays.items():
-      if (holiday.endswith("_week") and self.is_within_week_of(date, current_date)) or (current_date.date() == date.date()):
+      if (holiday.endswith("_week") and self.is_within_week_of(date, now)) or (now.date() == date.date()):
         if holiday != self.previous_assets.get("holiday_theme"):
           self.params.put("CurrentHolidayTheme", holiday)
           self.update_active_theme()
-        self.previous_assets["holiday_theme"] = holiday
         return
 
     if "holiday_theme" in self.previous_assets:
@@ -172,7 +171,7 @@ class ThemeManager:
       return
 
     holiday_themes = self.params.get_bool("HolidayThemes")
-    current_holiday_theme = self.previous_assets.get("holiday_theme") if holiday_themes else None
+    current_holiday_theme = self.params.get("CurrentHolidayTheme", encoding='utf-8') if holiday_themes else None
     personalize_openpilot = self.params.get_bool("PersonalizeOpenpilot")
 
     default_value = "stock"
@@ -186,16 +185,21 @@ class ThemeManager:
     }
 
     for toggle, (asset_type, current_value) in asset_mappings.items():
-      if current_value != self.previous_assets.get(toggle):
+      previous_holiday_theme = self.previous_assets.get("holiday_theme")
+      if current_value != self.previous_assets.get(toggle) or current_holiday_theme != previous_holiday_theme:
+        print(f"Updating {toggle}: {asset_type} with value {current_value} and holiday theme {current_holiday_theme}")
         if asset_type == "distance_icons":
           update_distance_icons(current_value, current_holiday_theme)
         elif asset_type == "wheel_image":
           update_wheel_image(current_value, current_holiday_theme, random_event=False)
         else:
           copy_theme_asset(asset_type, current_value, current_holiday_theme, self.params)
-        self.previous_assets[toggle] = current_value
-    self.params_memory.remove("UpdateTheme")
 
+        self.previous_assets[toggle] = current_value
+
+    self.previous_assets["holiday_theme"] = current_holiday_theme
+
+    self.params_memory.remove("UpdateTheme")
     update_frogpilot_toggles()
 
   def extract_zip(self, zip_file, extract_path):

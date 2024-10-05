@@ -151,7 +151,7 @@ class FrogPilotEvents:
         self.random_event_played = True
 
       if not self.youveGotMail_played and frogpilotCarControl.alwaysOnLateralActive and not self.always_on_lateral_active_previously:
-        if random.random() < 0.5 and carState.vEgo > CRUISING_SPEED:
+        if random.random() < 0.01 and carState.vEgo > CRUISING_SPEED:
           self.events.add(EventName.youveGotMail)
           self.youveGotMail_played = True
           self.random_event_played = True

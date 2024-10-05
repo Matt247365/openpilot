@@ -22,8 +22,9 @@ ui_env = qt_env.Clone()
 ui_env['CXXFLAGS'] += ["-Og", "-g3", "-fno-omit-frame-pointer", "-fstack-protector-all", "-fno-optimize-sibling-calls", "-fno-inline-functions", "-fno-strict-aliasing"]
 ui_env['LINKFLAGS'] += ["-rdynamic"]
 
-ui_sources = ["../frogpilot/ui/qt/widgets/drive_stats.cc", "../frogpilot/ui/qt/widgets/frogpilot_controls.cc",
-              "../frogpilot/ui/qt/widgets/model_reviewer.cc", "../frogpilot/navigation/ui/navigation_settings.cc",
+ui_sources = ["../frogpilot/navigation/ui/maps_settings.cc", "../frogpilot/navigation/ui/primeless_settings.cc",
+              "../frogpilot/navigation/ui/navigation_functions.cc", "../frogpilot/ui/qt/widgets/drive_stats.cc",
+              "../frogpilot/ui/qt/widgets/frogpilot_controls.cc", "../frogpilot/ui/qt/widgets/model_reviewer.cc",
               "../frogpilot/ui/qt/offroad/advanced_driving_settings.cc", "../frogpilot/ui/qt/offroad/advanced_visual_settings.cc",
               "../frogpilot/ui/qt/offroad/data_settings.cc", "../frogpilot/ui/qt/offroad/device_settings.cc",
               "../frogpilot/ui/qt/offroad/frogpilot_settings.cc", "../frogpilot/ui/qt/offroad/longitudinal_settings.cc",

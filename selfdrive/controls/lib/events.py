@@ -1008,7 +1008,11 @@ EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
 
   # FrogPilot Events
   EventName.blockUser: {
-    ET.NO_ENTRY: NoEntryAlert("Please don't use the 'Development' branch!"),
+    ET.NO_ENTRY: Alert(
+      "Please don't use the 'Development' branch!",
+      "Forcing you into 'Dashcam Mode' for your safety",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.HIGHEST, VisualAlert.none, AudibleAlert.none, 1.),
   },
 
   EventName.customStartupAlert: {

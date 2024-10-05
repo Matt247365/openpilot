@@ -17,6 +17,7 @@ private:
   FrogPilotSettingsWindow *parent;
 
   FrogPilotButtonToggleControl *borderMetricsBtn;
+  FrogPilotButtonToggleControl *lateralMetricsBtn;
 
   std::set<QString> advancedCustomOnroadUIKeys = {
     "CameraView", "HideLeadMarker", "HideSpeed",

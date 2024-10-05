@@ -24,7 +24,7 @@ def get_max_accel_sport_plus(v_ego):
   return interp(v_ego, A_CRUISE_MAX_BP_CUSTOM, A_CRUISE_MAX_VALS_SPORT_PLUS)
 
 def get_max_accel_ramp_off(max_accel, v_cruise, v_ego):
-  return interp(v_ego, [0., v_cruise * 0.7, v_cruise * 0.9, v_cruise], [max_accel, max_accel, max_accel / 2, max_accel / 4])
+  return interp(v_ego, [0., v_cruise * 0.5, v_cruise * 0.75, v_cruise], [max_accel, max_accel, max_accel / 2, max_accel / 4])
 
 def get_max_allowed_accel(v_ego):
   return interp(v_ego, [0., 5., 20.], [4.0, 4.0, 2.0])  # ISO 15622:2018

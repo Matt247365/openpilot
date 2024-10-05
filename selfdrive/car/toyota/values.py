@@ -69,7 +69,8 @@ class ToyotaFlags(IntFlag):
   RAISED_ACCEL_LIMIT = 1024
 
   # FrogPilot Toyota flags
-  ZSS = 4096
+  NEW_TOYOTA_TUNE = 4096
+  ZSS = 8192
 
 class Footnote(Enum):
   CAMRY = CarFootnote(

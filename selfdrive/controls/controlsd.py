@@ -429,6 +429,9 @@ class Controls:
     # Add FrogPilot events
     self.events.add_from_msg(self.sm['frogpilotPlan'].frogpilotEvents)
 
+    if self.block_user:
+      return EventName.blockUser
+
   def data_sample(self):
     """Receive data from sockets"""
 

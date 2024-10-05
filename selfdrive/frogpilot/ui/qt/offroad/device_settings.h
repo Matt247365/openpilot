@@ -14,8 +14,6 @@ signals:
   void openParentToggle();
 
 private:
-  FrogPilotSettingsWindow *parent;
-
   std::set<QString> deviceManagementKeys = {
     "DeviceShutdown", "IncreaseThermalLimits", "LowVoltageShutdown",
     "NoLogging", "NoUploads", "OfflineMode"
