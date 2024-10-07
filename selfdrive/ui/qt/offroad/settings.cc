@@ -367,9 +367,11 @@ void DevicePanel::showEvent(QShowEvent *event) {
 }
 
 void SettingsWindow::hideEvent(QHideEvent *event) {
+  closeMapSelection();
   closePanel();
   closeParentToggle();
 
+  mapSelectionOpen = false;
   panelOpen = false;
   parentToggleOpen = false;
   subParentToggleOpen = false;
@@ -412,7 +414,10 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
   sidebar_layout->addSpacing(10);
   sidebar_layout->addWidget(close_btn, 0, Qt::AlignRight);
   QObject::connect(close_btn, &QPushButton::clicked, [this]() {
-    if (subSubParentToggleOpen) {
+    if (mapSelectionOpen) {
+      closeMapSelection();
+      mapSelectionOpen = false;
+    } else if (subSubParentToggleOpen) {
       closeSubSubParentToggle();
       subSubParentToggleOpen = false;
     } else if (subParentToggleOpen) {
@@ -441,6 +446,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
   QObject::connect(toggles, &TogglesPanel::updateMetric, this, &SettingsWindow::updateMetric);
 
   FrogPilotSettingsWindow *frogpilotSettingsWindow = new FrogPilotSettingsWindow(this);
+  QObject::connect(frogpilotSettingsWindow, &FrogPilotSettingsWindow::openMapSelection, [this]() {mapSelectionOpen=true;});
   QObject::connect(frogpilotSettingsWindow, &FrogPilotSettingsWindow::openPanel, [this]() {panelOpen=true;});
   QObject::connect(frogpilotSettingsWindow, &FrogPilotSettingsWindow::openParentToggle, [this]() {parentToggleOpen=true;});
   QObject::connect(frogpilotSettingsWindow, &FrogPilotSettingsWindow::openSubParentToggle, [this]() {subParentToggleOpen=true;});
@@ -485,6 +491,10 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
     panel_widget->addWidget(panel_frame);
 
     QObject::connect(btn, &QPushButton::clicked, [=, w = panel_frame]() {
+      if (mapSelectionOpen) {
+        closeMapSelection();
+        mapSelectionOpen = false;
+      }
       if (panelOpen) {
         closePanel();
         panelOpen = false;

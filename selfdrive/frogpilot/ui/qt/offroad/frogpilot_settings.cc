@@ -1,7 +1,9 @@
 #include <filesystem>
 #include <iostream>
 
-#include "selfdrive/frogpilot/navigation/ui/navigation_settings.h"
+#include "selfdrive/ui/qt/widgets/scrollview.h"
+
+#include "selfdrive/frogpilot/navigation/ui/maps_settings.h"
 #include "selfdrive/frogpilot/ui/qt/offroad/advanced_driving_settings.h"
 #include "selfdrive/frogpilot/ui/qt/offroad/advanced_visual_settings.h"
 #include "selfdrive/frogpilot/ui/qt/offroad/data_settings.h"
@@ -61,6 +63,9 @@ FrogPilotSettingsWindow::FrogPilotSettingsWindow(SettingsWindow *parent) : QFram
   QObject::connect(frogpilotLongitudinalPanel, &FrogPilotLongitudinalPanel::openParentToggle, this, &FrogPilotSettingsWindow::openParentToggle);
   QObject::connect(frogpilotLongitudinalPanel, &FrogPilotLongitudinalPanel::openSubParentToggle, this, &FrogPilotSettingsWindow::openSubParentToggle);
 
+  FrogPilotMapsPanel *frogpilotMapsPanel = new FrogPilotMapsPanel(this);
+  QObject::connect(frogpilotMapsPanel, &FrogPilotMapsPanel::openMapSelection, this, &FrogPilotSettingsWindow::openMapSelection);
+
   FrogPilotSoundsPanel *frogpilotSoundsPanel = new FrogPilotSoundsPanel(this);
   QObject::connect(frogpilotSoundsPanel, &FrogPilotSoundsPanel::openParentToggle, this, &FrogPilotSettingsWindow::openParentToggle);
 
@@ -74,7 +79,7 @@ FrogPilotSettingsWindow::FrogPilotSettingsWindow(SettingsWindow *parent) : QFram
     {tr("Advanced Settings"), {frogpilotAdvancedDrivingPanel, frogpilotAdvancedVisualsPanel}},
     {tr("Alerts and Sounds"), {frogpilotSoundsPanel}},
     {tr("Driving Controls"), {frogpilotLongitudinalPanel, frogpilotLateralPanel}},
-    {tr("Navigation"), {new FrogPilotNavigationPanel(this)}},
+    {tr("Navigation"), {frogpilotMapsPanel}},
     {tr("System Management"), {new FrogPilotDataPanel(this), frogpilotDevicePanel, new UtilitiesPanel(this)}},
     {tr("Theme and Appearance"), {frogpilotVisualsPanel, frogpilotThemesPanel}},
     {tr("Vehicle Controls"), {new FrogPilotVehiclesPanel(this)}}
@@ -104,7 +109,7 @@ FrogPilotSettingsWindow::FrogPilotSettingsWindow(SettingsWindow *parent) : QFram
     {tr("DRIVING"), tr("VISUALS")},
     {tr("MANAGE")},
     {tr("GAS / BRAKE"), tr("STEERING")},
-    {tr("MANAGE")},
+    {tr("OFFLINE MAPS")},
     {tr("DATA"), tr("DEVICE"), tr("UTILITIES")},
     {tr("APPEARANCE"), tr("THEME")},
     {tr("MANAGE")}
@@ -121,6 +126,7 @@ FrogPilotSettingsWindow::FrogPilotSettingsWindow(SettingsWindow *parent) : QFram
   mainLayout->addWidget(frogpilotSettingsWidget);
   mainLayout->setCurrentWidget(frogpilotSettingsWidget);
 
+  QObject::connect(parent, &SettingsWindow::closeMapSelection, this, &FrogPilotSettingsWindow::closeMapSelection);
   QObject::connect(parent, &SettingsWindow::closePanel, this, &FrogPilotSettingsWindow::closePanel);
   QObject::connect(parent, &SettingsWindow::closeParentToggle, this, &FrogPilotSettingsWindow::closeParentToggle);
   QObject::connect(parent, &SettingsWindow::closeSubParentToggle, this, &FrogPilotSettingsWindow::closeSubParentToggle);
@@ -180,6 +186,7 @@ void FrogPilotSettingsWindow::updateCarVariables() {
     isImpreza = carFingerprint == "SUBARU_IMPREZA";
     isSubaru = carName == "subaru";
     isToyota = carName == "toyota";
+    isToyotaTuneSupported = carFingerprint == "LEXUS_ES_TSS2";
     isVolt = carFingerprint == "CHEVROLET_VOLT";
     forcingAutoTune = params.getBool("LateralTune") && params.getBool("ForceAutoTune");
     steerFrictionStock = CP.getLateralTuning().getTorque().getFriction();

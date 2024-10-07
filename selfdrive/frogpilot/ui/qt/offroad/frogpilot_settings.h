@@ -23,6 +23,7 @@ public:
   bool isImpreza;
   bool isSubaru;
   bool isToyota;
+  bool isToyotaTuneSupported;
   bool isVolt;
   bool forcingAutoTune;
   bool liveValid;
@@ -33,9 +34,11 @@ public:
   float steerRatioStock;
 
 signals:
+  void closeMapSelection();
   void closeParentToggle();
   void closeSubParentToggle();
   void closeSubSubParentToggle();
+  void openMapSelection();
   void openPanel();
   void openParentToggle();
   void openSubParentToggle();

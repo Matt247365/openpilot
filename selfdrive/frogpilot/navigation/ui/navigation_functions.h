@@ -1,32 +1,26 @@
 #pragma once
 
-#include <deque>
 #include <filesystem>
-#include <QDir>
-#include <QDirIterator>
-#include <QFileInfo>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <string>
 
-#include "selfdrive/ui/qt/offroad/settings.h"
-#include "selfdrive/ui/qt/widgets/controls.h"
-#include "selfdrive/ui/ui.h"
+#include <QDateTime>
 
-QMap<QString, QString> northeastMap = {
+#include "selfdrive/frogpilot/ui/qt/widgets/frogpilot_controls.h"
+
+inline QMap<QString, QString> northeastMap = {
   {"CT", "Connecticut"}, {"ME", "Maine"}, {"MA", "Massachusetts"},
   {"NH", "New Hampshire"}, {"NJ", "New Jersey"}, {"NY", "New York"},
   {"PA", "Pennsylvania"}, {"RI", "Rhode Island"}, {"VT", "Vermont"}
 };
 
-QMap<QString, QString> midwestMap = {
+inline QMap<QString, QString> midwestMap = {
   {"IL", "Illinois"}, {"IN", "Indiana"}, {"IA", "Iowa"},
   {"KS", "Kansas"}, {"MI", "Michigan"}, {"MN", "Minnesota"},
   {"MO", "Missouri"}, {"NE", "Nebraska"}, {"ND", "North Dakota"},
   {"OH", "Ohio"}, {"SD", "South Dakota"}, {"WI", "Wisconsin"}
 };
 
-QMap<QString, QString> southMap = {
+inline QMap<QString, QString> southMap = {
   {"AL", "Alabama"}, {"AR", "Arkansas"}, {"DE", "Delaware"},
   {"DC", "District of Columbia"}, {"FL", "Florida"}, {"GA", "Georgia"},
   {"KY", "Kentucky"}, {"LA", "Louisiana"}, {"MS", "Mississippi"},
@@ -35,7 +29,7 @@ QMap<QString, QString> southMap = {
   {"WV", "West Virginia"}
 };
 
-QMap<QString, QString> westMap = {
+inline QMap<QString, QString> westMap = {
   {"AK", "Alaska"}, {"AZ", "Arizona"}, {"CA", "California"},
   {"CO", "Colorado"}, {"HI", "Hawaii"}, {"ID", "Idaho"},
   {"MT", "Montana"}, {"NV", "Nevada"}, {"NM", "New Mexico"},
@@ -43,12 +37,12 @@ QMap<QString, QString> westMap = {
   {"WY", "Wyoming"}
 };
 
-QMap<QString, QString> territoriesMap = {
+inline QMap<QString, QString> territoriesMap = {
   {"AS", "American Samoa"}, {"GU", "Guam"}, {"MP", "Northern Mariana Islands"},
   {"PR", "Puerto Rico"}, {"VI", "Virgin Islands"}
 };
 
-QMap<QString, QString> africaMap = {
+inline QMap<QString, QString> africaMap = {
   {"DZ", "Algeria"}, {"AO", "Angola"}, {"BJ", "Benin"}, {"BW", "Botswana"},
   {"BF", "Burkina Faso"}, {"BI", "Burundi"}, {"CM", "Cameroon"}, {"CV", "Cape Verde"},
   {"CF", "Central African Republic"}, {"CE", "Ceuta"}, {"TD", "Chad"},
@@ -70,11 +64,11 @@ QMap<QString, QString> africaMap = {
   {"ZW", "Zimbabwe"}
 };
 
-QMap<QString, QString> antarcticaMap = {
+inline QMap<QString, QString> antarcticaMap = {
   {"AQ", "Antarctica"}
 };
 
-QMap<QString, QString> asiaMap = {
+inline QMap<QString, QString> asiaMap = {
   {"AF", "Afghanistan"}, {"AM", "Armenia"}, {"AZ", "Azerbaijan"},
   {"BH", "Bahrain"}, {"BD", "Bangladesh"}, {"BT", "Bhutan"},
   {"BN", "Brunei"}, {"KH", "Cambodia"}, {"CN", "China"},
@@ -94,7 +88,7 @@ QMap<QString, QString> asiaMap = {
   {"UZ", "Uzbekistan"}, {"VN", "Vietnam"}, {"YE", "Yemen"}
 };
 
-QMap<QString, QString> europeMap = {
+inline QMap<QString, QString> europeMap = {
   {"AL", "Albania"}, {"AD", "Andorra"}, {"AM", "Armenia"},
   {"AT", "Austria"}, {"AZ", "Azerbaijan"}, {"BY", "Belarus"},
   {"BE", "Belgium"}, {"BA", "Bosnia and Herzegovina"}, {"BG", "Bulgaria"},
@@ -115,7 +109,7 @@ QMap<QString, QString> europeMap = {
   {"GB", "United Kingdom"}, {"VA", "Vatican City"}
 };
 
-QMap<QString, QString> northAmericaMap = {
+inline QMap<QString, QString> northAmericaMap = {
   {"AG", "Antigua and Barbuda"}, {"AI", "Anguilla"}, {"AW", "Aruba"},
   {"BS", "Bahamas"}, {"BB", "Barbados"}, {"BZ", "Belize"},
   {"BM", "Bermuda"}, {"CA", "Canada"}, {"KY", "Cayman Islands"},
@@ -131,7 +125,7 @@ QMap<QString, QString> northAmericaMap = {
   {"VG", "British Virgin Islands"}, {"VI", "United States Virgin Islands"}
 };
 
-QMap<QString, QString> oceaniaMap = {
+inline QMap<QString, QString> oceaniaMap = {
   {"AS", "American Samoa"}, {"AU", "Australia"}, {"CK", "Cook Islands"},
   {"FJ", "Fiji"}, {"PF", "French Polynesia"}, {"GU", "Guam"},
   {"KI", "Kiribati"}, {"MH", "Marshall Islands"}, {"FM", "Micronesia"},
@@ -143,7 +137,7 @@ QMap<QString, QString> oceaniaMap = {
   {"WF", "Wallis and Futuna"}
 };
 
-QMap<QString, QString> southAmericaMap = {
+inline QMap<QString, QString> southAmericaMap = {
   {"AR", "Argentina"}, {"BO", "Bolivia"}, {"BR", "Brazil"},
   {"CL", "Chile"}, {"CO", "Colombia"}, {"EC", "Ecuador"},
   {"FK", "Falkland Islands"}, {"GF", "French Guiana"},
@@ -152,193 +146,90 @@ QMap<QString, QString> southAmericaMap = {
   {"UY", "Uruguay"}, {"VE", "Venezuela"}
 };
 
-class ButtonSelectionControl : public QWidget {
-public:
-  static QString selectedStates;
-  static QString selectedCountries;
+namespace fs = std::filesystem;
 
-  explicit ButtonSelectionControl(const QString &id, const QString &title, const QString &description,
-                                  const QMap<QString, QString> &map, bool isCountry, QWidget *parent = nullptr)
-      : QWidget(parent), country(isCountry) {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setAlignment(Qt::AlignTop);
-    layout->setSpacing(10);
+inline bool isMapdRunning() {
+  return std::system("pgrep mapd > /dev/null 2>&1") == 0;
+}
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
-    buttonsLayout->setSpacing(10);
-    layout->addLayout(buttonsLayout);
+inline QString calculateDirectorySize(const QString &directoryPath) {
+  constexpr uintmax_t oneGB = 1024 * 1024 * 1024;
+  constexpr uintmax_t oneMB = 1024 * 1024;
 
-    int count = 0;
-    int max = country ? 3 : 4;
+  uintmax_t totalSize = 0;
+  fs::path path(directoryPath.toStdString());
 
-    QJsonObject mapsSelected = QJsonDocument::fromJson(QString::fromStdString(Params().get("MapsSelected")).toUtf8()).object();
-
-    QList<QString> sortedKeys = map.keys();
-    std::sort(sortedKeys.begin(), sortedKeys.end(), [&](const QString &a, const QString &b) {
-      return map[a] < map[b];
-    });
-
-    for (const QString &stateCode : sortedKeys) {
-      if (count % max == 0 && count != 0) {
-        buttonsLayout = new QHBoxLayout();
-        buttonsLayout->setSpacing(10);
-        layout->addLayout(buttonsLayout);
-      }
-
-      QPushButton *button = createButton(buttonsLayout, map[stateCode], stateCode);
-
-      QString key = country ? "nations" : "states";
-      if (mapsSelected.contains(key)) {
-        QJsonArray selectedItems = mapsSelected.value(key).toArray();
-        button->setChecked(selectedItems.contains(stateCode));
-      }
-
-      count++;
-    }
-
-    adjustButtonWidths(buttonsLayout);
+  if (!fs::exists(path) || !fs::is_directory(path)) {
+    return "0 MB";
   }
 
-private:
-  bool country;
-
-  const QString buttonStyle = R"(
-    QPushButton {
-      border-radius: 50px; font-size: 40px; font-weight: 500;
-      height: 100px; padding: 0 25 0 25; color: #E4E4E4;
-      background-color: #393939;
-    }
-    QPushButton:pressed, QPushButton:checked {
-      background-color: #4a4a4a;
-    }
-    QPushButton:checked:enabled {
-      background-color: #33Ab4C;
-    }
-    QPushButton:disabled {
-      color: #33E4E4E4;
-    }
-  )";
-
-  QPushButton *createButton(QHBoxLayout *layout, const QString &label, const QString &stateCode) {
-    QPushButton *button = new QPushButton(label, this);
-    button->setCheckable(true);
-    button->setStyleSheet(buttonStyle);
-    QObject::connect(button, &QPushButton::clicked, this, [this, button, stateCode] { updateState(stateCode, button); });
-    layout->addWidget(button);
-    return button;
-  }
-
-  void adjustButtonWidths(QHBoxLayout *layout) {
-    if (!layout || layout->count() == (country ? 3 : 4)) return;
-
-    for (int i = 0; i < layout->count(); ++i) {
-      QWidget *widget = layout->itemAt(i)->widget();
-      QPushButton *button = qobject_cast<QPushButton *>(widget);
-      if (button) {
-        button->setMinimumWidth(button->sizeHint().width());
-      }
+  for (fs::recursive_directory_iterator iter(path, fs::directory_options::skip_permission_denied), end; iter != end; ++iter) {
+    const fs::directory_entry &entry = *iter;
+    if (entry.is_regular_file()) {
+      totalSize += entry.file_size();
     }
   }
 
-  void updateState(const QString &newState, QPushButton *button) {
-    QString &selectedList = country ? selectedCountries : selectedStates;
-    QStringList tempList = selectedList.split(',');
-
-    if (button->isChecked()) {
-      if (!selectedList.isEmpty()) selectedList += ",";
-      selectedList += newState;
-    } else {
-      tempList.removeAll(newState);
-      selectedList = tempList.join(',');
-    }
-
-    Params("/dev/shm/params").remove("OSMDownloadLocations");
-  }
-};
-
-QString ButtonSelectionControl::selectedStates = "";
-QString ButtonSelectionControl::selectedCountries = "";
-
-namespace {
-  template <typename T>
-  T extractFromJson(const std::string &jsonData, const std::string &key, T defaultValue = 0) {
-    std::string::size_type pos = jsonData.find(key);
-    return pos != std::string::npos ? std::stol(jsonData.substr(pos + key.length())) : defaultValue;
+  if (totalSize >= oneGB) {
+    return QString::number(static_cast<double>(totalSize) / oneGB, 'f', 2) + " GB";
+  } else {
+    return QString::number(static_cast<double>(totalSize) / oneMB, 'f', 2) + " MB";
   }
 }
 
-QString formatTime(long timeInSeconds) {
-  long minutes = timeInSeconds / 60;
-  long seconds = timeInSeconds % 60;
-  QString formattedTime = (minutes > 0) ? QString::number(minutes) + "m " : "";
-  formattedTime += QString::number(seconds) + "s";
+inline QString formatCurrentDate() {
+  QDate currentDate = QDate::currentDate();
+  QString suffix;
+  int day = currentDate.day();
+
+  if (day % 10 == 1 && day != 11) {
+    suffix = "st";
+  } else if (day % 10 == 2 && day != 12) {
+    suffix = "nd";
+  } else if (day % 10 == 3 && day != 13) {
+    suffix = "rd";
+  } else {
+    suffix = "th";
+  }
+
+  return currentDate.toString("MMMM d'") + suffix + QString(", %1").arg(currentDate.year());
+}
+
+inline QString formatElapsedTime(qint64 elapsedMilliseconds) {
+  qint64 totalSeconds = elapsedMilliseconds / 1000;
+  qint64 hours = totalSeconds / 3600;
+  qint64 minutes = (totalSeconds % 3600) / 60;
+  qint64 seconds = totalSeconds % 60;
+
+  QString formattedTime;
+  if (hours > 0) {
+    formattedTime += QString::number(hours) + (hours == 1 ? " hour " : " hours ");
+  }
+  if (minutes > 0) {
+    formattedTime += QString::number(minutes) + (minutes == 1 ? " minute " : " minutes ");
+  }
+  formattedTime += QString::number(seconds) + (seconds == 1 ? " second" : " seconds");
+
   return formattedTime;
 }
 
-QString formatDateTime(const std::chrono::time_point<std::chrono::system_clock> &timePoint) {
-  return QDateTime::fromTime_t(std::chrono::system_clock::to_time_t(timePoint)).toString("h:mm ap");
-}
+class MapSelectionControl : public QWidget {
+  Q_OBJECT
 
-QString calculateElapsedTime(int totalFiles, int downloadedFiles, const std::chrono::steady_clock::time_point &startTime) {
-  using namespace std::chrono;
-  if (totalFiles <= 0 || downloadedFiles >= totalFiles) return "Calculating...";
+public:
+  MapSelectionControl(const QMap<QString, QString> &map, bool isCountry = false, QWidget *parent = nullptr);
 
-  long elapsed = duration_cast<seconds>(steady_clock::now() - startTime).count();
-  return formatTime(elapsed);
-}
+private:
+  void loadSelectedMaps();
+  void updateSelectedMaps();
 
-QString calculateETA(int totalFiles, int downloadedFiles, const std::chrono::steady_clock::time_point &startTime) {
-  using namespace std::chrono;
-  if (totalFiles <= 0 || downloadedFiles >= totalFiles) return "Calculating...";
+  Params params;
 
-  long elapsed = duration_cast<seconds>(steady_clock::now() - startTime).count();
+  QButtonGroup *buttonGroup;
 
-  if (downloadedFiles == 0 || elapsed <= 0) {
-    return "Calculating...";
-  }
+  QGridLayout *gridLayout;
 
-  double averageTimePerFile = static_cast<double>(elapsed) / downloadedFiles;
-  int remainingFiles = totalFiles - downloadedFiles;
-  long estimatedTimeRemaining = static_cast<long>(averageTimePerFile * remainingFiles);
+  QMap<QString, QString> mapData;
 
-  std::chrono::time_point<std::chrono::system_clock> estimatedCompletionTime = system_clock::now() + seconds(estimatedTimeRemaining);
-  QString estimatedTimeStr = formatDateTime(estimatedCompletionTime);
-
-  return formatTime(estimatedTimeRemaining) + " (" + estimatedTimeStr + ")";
-
-}
-
-QString formatDownloadStatus(int totalFiles, int downloadedFiles) {
-  if (totalFiles <= 0) return "Calculating...";
-  if (downloadedFiles >= totalFiles) return "Downloaded";
-
-  int percentage = static_cast<int>(100 * downloadedFiles / totalFiles);
-  return QString::asprintf("Downloading: %d/%d (%d%%)", downloadedFiles, totalFiles, percentage);
-}
-
-quint64 calculateDirectorySize(const QString &path) {
-  quint64 totalSize = 0;
-  QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
-  while (it.hasNext()) {
-    it.next();
-    QFileInfo fileInfo(it.filePath());
-    if (fileInfo.isFile()) {
-      totalSize += fileInfo.size();
-    }
-  }
-  return totalSize;
-}
-
-QString formatSize(qint64 size) {
-  const qint64 kb = 1024;
-  const qint64 mb = 1024 * kb;
-  const qint64 gb = 1024 * mb;
-
-  if (size < gb) {
-    double sizeMB = size / static_cast<double>(mb);
-    return QString::number(sizeMB, 'f', 2) + " MB";
-  } else {
-    double sizeGB = size / static_cast<double>(gb);
-    return QString::number(sizeGB, 'f', 2) + " GB";
-  }
-}
+  bool isCountry;
+};

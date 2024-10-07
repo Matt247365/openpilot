@@ -152,22 +152,6 @@ class FrogPilotVariables:
     toggle.lead_departing_alert = custom_alerts and self.params.get_bool("LeadDepartingAlert")
     toggle.loud_blindspot_alert = custom_alerts and self.params.get_bool("LoudBlindspotAlert")
 
-    custom_ui = self.params.get_bool("CustomUI")
-    custom_paths = custom_ui and self.params.get_bool("CustomPaths")
-    toggle.adjacent_lanes = custom_paths and self.params.get_bool("AdjacentPath")
-    toggle.blind_spot_path = custom_paths and self.params.get_bool("BlindSpotPath")
-
-    developer_ui = self.params.get_bool("DeveloperUI")
-    show_lateral = developer_ui and self.params.get_bool("LateralMetrics")
-    toggle.adjacent_path_metrics = show_lateral and self.params.get_bool("AdjacentPathMetrics")
-
-    toggle.device_management = self.params.get_bool("DeviceManagement")
-    device_shutdown_setting = self.params.get_int("DeviceShutdown") if toggle.device_management else 33
-    toggle.device_shutdown_time = (device_shutdown_setting - 3) * 3600 if device_shutdown_setting >= 4 else device_shutdown_setting * (60 * 15)
-    toggle.increase_thermal_limits = toggle.device_management and self.params.get_bool("IncreaseThermalLimits")
-    toggle.low_voltage_shutdown = self.params.get_float("LowVoltageShutdown") if toggle.device_management else VBATT_PAUSE_CHARGING
-    toggle.offline_mode = toggle.device_management and self.params.get_bool("OfflineMode")
-
     toggle.custom_personalities = toggle.openpilot_longitudinal and self.params.get_bool("CustomPersonalities")
     aggressive_profile = toggle.custom_personalities and self.params.get_bool("AggressivePersonalityProfile")
     toggle.aggressive_jerk_acceleration = self.params.get_int("AggressiveJerkAcceleration") / 100. if aggressive_profile else 0.5
@@ -197,6 +181,22 @@ class FrogPilotVariables:
     toggle.traffic_mode_jerk_speed = [self.params.get_int("TrafficJerkSpeed") / 100., toggle.aggressive_jerk_speed] if traffic_profile else [0.5, 0.5]
     toggle.traffic_mode_jerk_speed_decrease = [self.params.get_int("TrafficJerkSpeedDecrease") / 100., toggle.aggressive_jerk_speed_decrease] if traffic_profile else [0.5, 0.5]
     toggle.traffic_mode_t_follow = [self.params.get_float("TrafficFollow"), toggle.aggressive_follow] if traffic_profile else [0.5, 1.0]
+
+    custom_ui = self.params.get_bool("CustomUI")
+    custom_paths = custom_ui and self.params.get_bool("CustomPaths")
+    toggle.adjacent_lanes = custom_paths and self.params.get_bool("AdjacentPath")
+    toggle.blind_spot_path = custom_paths and self.params.get_bool("BlindSpotPath")
+
+    developer_ui = self.params.get_bool("DeveloperUI")
+    show_lateral = developer_ui and self.params.get_bool("LateralMetrics")
+    toggle.adjacent_path_metrics = show_lateral and self.params.get_bool("AdjacentPathMetrics")
+
+    toggle.device_management = self.params.get_bool("DeviceManagement")
+    device_shutdown_setting = self.params.get_int("DeviceShutdown") if toggle.device_management else 33
+    toggle.device_shutdown_time = (device_shutdown_setting - 3) * 3600 if device_shutdown_setting >= 4 else device_shutdown_setting * (60 * 15)
+    toggle.increase_thermal_limits = toggle.device_management and self.params.get_bool("IncreaseThermalLimits")
+    toggle.low_voltage_shutdown = self.params.get_float("LowVoltageShutdown") if toggle.device_management else VBATT_PAUSE_CHARGING
+    toggle.offline_mode = toggle.device_management and self.params.get_bool("OfflineMode")
 
     toggle.experimental_mode_via_press = toggle.openpilot_longitudinal and self.params.get_bool("ExperimentalModeActivation")
     toggle.experimental_mode_via_distance = toggle.experimental_mode_via_press and self.params.get_bool("ExperimentalModeViaDistance")

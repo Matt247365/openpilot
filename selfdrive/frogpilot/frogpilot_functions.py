@@ -2,21 +2,18 @@ import datetime
 import errno
 import filecmp
 import glob
-import http.client
 import numpy as np
 import os
 import shutil
-import socket
 import subprocess
 import sys
 import tarfile
 import threading
 import time
-import urllib.error
 import urllib.request
 
 from openpilot.common.basedir import BASEDIR
-from openpilot.common.numpy_fast import clip, interp, mean
+from openpilot.common.numpy_fast import interp, mean
 from openpilot.common.params_pyx import Params, ParamKeyType, UnknownKeyName
 from openpilot.common.time import system_time_valid
 from openpilot.system.hardware import HARDWARE
@@ -115,6 +112,7 @@ def backup_frogpilot(build_metadata, params):
   minimum_backup_size = params.get_int("MinimumBackupSize")
 
   backup_path = "/data/backups"
+  os.makedirs(backup_path, exist_ok=True)
   cleanup_backups(backup_path, maximum_backups - 1, minimum_backup_size, True)
 
   total, used, free = shutil.disk_usage(backup_path)
@@ -138,6 +136,7 @@ def backup_toggles(params, params_storage):
   maximum_backups = 10
 
   backup_path = "/data/toggle_backups"
+  os.makedirs(backup_path, exist_ok=True)
   cleanup_backups(backup_path, 10 - 1)
 
   backup_dir = os.path.join(backup_path, datetime.datetime.now().strftime('%Y-%m-%d_%I-%M%p').lower() + "_auto")
@@ -236,10 +235,7 @@ def is_url_pingable(url, timeout=5):
   try:
     urllib.request.urlopen(url, timeout=timeout)
     return True
-  except (http.client.IncompleteRead, http.client.RemoteDisconnected, socket.timeout):
-    return False
   except Exception as e:
-    print(f"An unexpected error occurred while trying to ping {url}: {e}")
     return False
 
 def run_cmd(cmd, success_message, fail_message, retries=5, delay=1):

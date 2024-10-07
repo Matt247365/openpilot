@@ -232,6 +232,7 @@ def manager_init() -> None:
     ("NavigationModels", ""),
     ("NewLongAPI", "0"),
     ("NewLongAPIGM", "1"),
+    ("NewToyotaTune", "0"),
     ("NNFF", "1"),
     ("NNFFLite", "1"),
     ("NoLogging", "0"),

@@ -13,8 +13,8 @@ from openpilot.selfdrive.frogpilot.frogpilot_functions import MODELS_PATH, delet
 
 VERSION = "v9"
 
-DEFAULT_MODEL = "north-dakota-v2"
-DEFAULT_MODEL_NAME = "North Dakota V2 (Default)"
+DEFAULT_MODEL = "north-dakota"
+DEFAULT_MODEL_NAME = "North Dakota (Default)"
 
 def process_model_name(model_name):
   cleaned_name = re.sub(r'[🗺️👀📡]', '', model_name)
