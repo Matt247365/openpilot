@@ -1,15 +1,9 @@
-import libusb
-
 Import('env', 'common', 'messaging')
 
-pandad_env = env.Clone()
-pandad_env['CPPPATH'] += [libusb.INCLUDE_DIR]
-pandad_env['LIBPATH'] += [libusb.LIB_DIR]
-
 libs = ['usb-1.0', common, messaging, 'pthread']
-panda = pandad_env.Library('panda', ['panda.cc', 'panda_comms.cc', 'spi.cc'])
+panda = env.Library('panda', ['panda.cc', 'panda_comms.cc', 'spi.cc'])
 
-pandad_env.Program('pandad', ['main.cc', 'pandad.cc', 'panda_safety.cc'], LIBS=[panda] + libs)
+env.Program('pandad', ['main.cc', 'pandad.cc', 'panda_safety.cc'], LIBS=[panda] + libs)
 
 if GetOption('extras'):
-  pandad_env.Program('tests/test_pandad_usbprotocol', ['tests/test_pandad_usbprotocol.cc'], LIBS=[panda] + libs)
+  env.Program('tests/test_pandad_usbprotocol', ['tests/test_pandad_usbprotocol.cc'], LIBS=[panda] + libs)
