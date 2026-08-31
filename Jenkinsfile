@@ -218,6 +218,12 @@ node {
           step("test manager", "./openpilot/system/manager/test/test_manager.py"),
         ])
       },
+      'loopback': {
+        deviceStage("loopback", "tizi-loopback", ["UNSAFE=1"], [
+          step("build openpilot", "cd openpilot/system/manager && ./build.py"),
+          step("test pandad loopback", "./openpilot/selfdrive/pandad/tests/test_pandad_loopback.py"),
+        ])
+      },
       'camerad OX03C10': {
         deviceStage("OX03C10", "tizi-ox03c10", ["UNSAFE=1"], [
           step("build", "cd openpilot/system/manager && ./build.py"),
@@ -247,7 +253,7 @@ node {
       'tizi': {
         deviceStage("tizi", "tizi", ["UNSAFE=1"], [
           step("build openpilot", "cd openpilot/system/manager && ./build.py"),
-          step("test pandad loopback", "./openpilot/selfdrive/pandad/tests/test_pandad_loopback.py"),
+          step("test pandad loopback", "SINGLE_PANDA=1 ./openpilot/selfdrive/pandad/tests/test_pandad_loopback.py"),
           step("test pandad spi", "./openpilot/selfdrive/pandad/tests/test_pandad_spi.py"),
           step("test amp", "./openpilot/common/hardware/comma/tests/test_amplifier.py"),
         ])
